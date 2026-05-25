@@ -1,0 +1,686 @@
+:root {
+  --wall-a: #8d6a3f;
+  --wall-b: #5c3f22;
+  --bar-dark: #1f2937;
+  --bar-light: #4b5563;
+  --door: #2f3541;
+  --ink: #fff7d6;
+  --badge: #f59e0b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+  font-family: "Chivo", sans-serif;
+  color: var(--ink);
+  background: transparent;
+  overflow: hidden;
+}
+
+.screen {
+  min-height: 100vh;
+  padding: 24px;
+  display: grid;
+  grid-template-rows: 440px;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.headline {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 2px dashed rgb(255 245 200 / 35%);
+  padding-bottom: 8px;
+  animation: fadein 650ms ease;
+}
+
+.headline h1 {
+  margin: 0;
+  font-family: "Bebas Neue", sans-serif;
+  letter-spacing: 1px;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: #fff1b0;
+  text-shadow: 0 3px 0 rgb(0 0 0 / 28%);
+  animation: titleflicker 7s ease-in-out infinite;
+}
+
+.headline p {
+  margin: 0;
+  font-size: 1rem;
+  text-transform: uppercase;
+  color: #fff4c8;
+}
+
+.cells,
+.death-row {
+  border-radius: 14px;
+  border: 2px solid rgb(20 20 20 / 42%);
+  background:
+    linear-gradient(rgb(0 0 0 / 12%), rgb(0 0 0 / 32%)),
+    linear-gradient(180deg, #7a5730, #5f4225);
+  box-shadow: inset 0 10px 22px rgb(0 0 0 / 26%);
+  padding: 14px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.cells {
+  animation: cellglow 5s ease-in-out infinite;
+}
+
+.death-row {
+  animation: deathglow 4s ease-in-out infinite;
+}
+
+.cells h2,
+.death-row h2 {
+  margin: 0 0 10px;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 3.6rem;
+  letter-spacing: 0.8px;
+}
+
+.bars {
+  position: relative;
+  border-radius: 12px;
+  border: 3px solid rgb(20 20 20 / 44%);
+  background:
+    radial-gradient(circle at 80% 0%, rgb(255 255 255 / 8%), transparent 40%),
+    linear-gradient(180deg, #323845, #232933 40%, #1c222b);
+  padding: 10px;
+  display: block;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.bars::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(
+    110deg,
+    transparent 20%,
+    rgb(255 255 255 / 7%) 50%,
+    transparent 80%
+  );
+  animation: barshimmer 7s linear infinite;
+}
+
+.bars::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgb(0 0 0 / 35%) 0 6px,
+      rgb(90 102 121 / 98%) 6px 23px,
+      rgb(0 0 0 / 36%) 23px 26px,
+      transparent 26px 52px
+    );
+}
+
+.prisoner-card {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  height: calc(100% - 20px);
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  border: 2px solid rgb(255 255 255 / 18%);
+  background: rgb(9 11 15 / 62%);
+  overflow: hidden;
+  will-change: transform;
+  animation: slidein 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.prisoner-card img {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  object-fit: cover;
+  border: 0;
+}
+
+.prisoner-id {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 8px;
+  z-index: 3;
+  border-radius: 8px;
+  padding: 5px 8px;
+  text-align: center;
+  background: rgb(15 23 42 / 92%);
+  border: 1px solid rgb(255 255 255 / 34%);
+  color: #f8fafc;
+  font-size: clamp(1.45rem, 2.1vw, 2.05rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 72%);
+}
+
+.status-chip {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 3;
+  border-radius: 999px;
+  padding: 2px 6px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  background: rgb(14 116 144 / 88%);
+  color: #ecfeff;
+  border: 1px solid rgb(255 255 255 / 26%);
+  animation: chippulse 1.8s ease-in-out infinite;
+}
+
+.empty-note {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  margin: 14px;
+  color: rgb(255 245 220 / 82%);
+  font-size: 0.92rem;
+  padding: 4px 2px;
+}
+
+.execution-stage {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.execution-banner {
+  position: absolute;
+  inset: auto 20px 20px 20px;
+  max-width: 420px;
+  padding: 14px;
+  font-size: clamp(0.78rem, 0.95vw, 0.92rem);
+  border-radius: 12px;
+  border: 2px solid rgb(245 158 11 / 68%);
+  background: rgb(66 32 6 / 90%);
+  color: #fff7d6;
+  z-index: 42;
+  animation: bannerlifecycle 4.8s ease forwards;
+}
+
+.actor {
+  color: #fde68a;
+}
+
+.catapult-scene,
+.plank-scene {
+  position: absolute;
+  left: 50%;
+  bottom: 7%;
+  transform: translateX(-50%);
+  width: min(92vw, 860px);
+  height: min(47vh, 320px);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 2px solid rgb(255 255 255 / 28%);
+  background: linear-gradient(180deg, rgb(19 31 51 / 92%), rgb(15 23 42 / 88%));
+  z-index: 41;
+  animation: scenelifecycle 4.8s ease forwards;
+}
+
+.catapult-scene::before,
+.plank-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: white;
+  z-index: 50;
+  pointer-events: none;
+  animation: sceneflash 0.5s ease-out forwards;
+}
+
+.execution-sky {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 16%, rgb(255 255 255 / 22%), transparent 35%),
+    linear-gradient(180deg, rgb(56 96 157 / 40%), transparent 50%);
+}
+
+.catapult-ground {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 27%;
+  background:
+    repeating-linear-gradient(
+      -8deg,
+      rgb(0 0 0 / 12%) 0 14px,
+      transparent 14px 28px
+    ),
+    linear-gradient(180deg, #566279, #414d61);
+}
+
+.catapult-rig {
+  position: absolute;
+  left: 10%;
+  bottom: 18%;
+  width: clamp(160px, 30%, 250px);
+  height: clamp(110px, 36%, 160px);
+}
+
+.catapult-wheel {
+  position: absolute;
+  bottom: 2%;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 5px solid #312f38;
+  background: radial-gradient(circle at 35% 35%, #facc15, #ca8a04);
+}
+
+.catapult-wheel-left {
+  left: 10%;
+}
+
+.catapult-wheel-right {
+  left: 54%;
+}
+
+.catapult-frame {
+  position: absolute;
+  left: 8%;
+  right: 12%;
+  bottom: 18%;
+  height: 20px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #c08433, #92400e);
+  border: 2px solid rgb(38 20 6 / 42%);
+}
+
+.catapult-arm {
+  position: absolute;
+  left: 47%;
+  bottom: 26%;
+  width: 14px;
+  height: 82px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #fbbf24, #a16207);
+  transform-origin: 50% 100%;
+  animation: armthrow 0.75s cubic-bezier(0.17, 0.67, 0.12, 1.08) 0.28s both;
+}
+
+.catapult-bucket {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 14px;
+  border-radius: 6px;
+  background: #334155;
+}
+
+.execution-prisoner {
+  position: absolute;
+  width: clamp(72px, 10vw, 96px);
+  height: clamp(72px, 10vw, 96px);
+}
+
+.execution-prisoner-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  border: 2px solid rgb(255 255 255 / 18%);
+  background: rgb(9 11 15 / 62%);
+  overflow: hidden;
+}
+
+.execution-prisoner .prisoner-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.execution-prisoner .prisoner-id {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  width: max-content;
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+  padding: 3px 9px;
+}
+
+.catapult-victim {
+  left: 10%;
+  bottom: 31%;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  animation: catapult-flight 1.5s linear 0.28s forwards;
+}
+
+.plank-water {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 24%;
+  background:
+    repeating-linear-gradient(
+      -14deg,
+      rgb(255 255 255 / 14%) 0 8px,
+      transparent 8px 18px
+    ),
+    linear-gradient(180deg, #22d3ee, #0369a1);
+  background-size: 36px 36px, 100% 100%;
+  animation: waterflow 2.4s linear infinite;
+}
+
+.plank-dock {
+  position: absolute;
+  left: 0;
+  bottom: 24%;
+  width: 32%;
+  height: 30%;
+  background: linear-gradient(180deg, #6b3f1f, #4a2a16);
+  border-right: 4px solid rgb(32 18 8 / 52%);
+}
+
+.plank {
+  position: absolute;
+  left: 26%;
+  bottom: 38%;
+  width: 34%;
+  height: 18px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #6b3f1f, #4a2a16);
+  border: 1px solid rgb(32 18 8 / 52%);
+  box-shadow: 0 4px 0 rgb(44 25 10 / 58%);
+}
+
+.plank-victim {
+  left: 30.5%;
+  bottom: 44%;
+  will-change: transform, opacity;
+  animation: plank-walk-fall 2.85s linear 0.28s forwards;
+}
+
+.splash {
+  position: absolute;
+  bottom: 11%;
+  right: 30%;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  opacity: 0;
+  animation: splash-core 0.95s ease-out 3.06s forwards;
+}
+
+.splash::before,
+.splash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.splash::before {
+  border: 4px solid rgb(186 230 253 / 82%);
+  animation: splash-ring-outer 1.05s ease-out 3.06s forwards;
+}
+
+.splash::after {
+  border: 3px solid rgb(224 242 254 / 88%);
+  inset: 14px;
+  animation: splash-ring-inner 0.9s ease-out 3.12s forwards;
+}
+
+.methods {
+  grid-column: 1 / -1;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  font-size: 0.85rem;
+  color: rgb(255 245 220 / 82%);
+}
+
+@media (max-width: 800px) {
+  .screen {
+    padding: 12px;
+    gap: 10px;
+  }
+}
+
+/* ── keyframes ────────────────────────────────────────────────────────── */
+
+@keyframes slidein {
+  from {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeout {
+  0% { opacity: 0; }
+  8% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* occasional torch-flicker on the title */
+@keyframes titleflicker {
+  0%, 89%, 100% {
+    text-shadow: 0 3px 0 rgb(0 0 0 / 28%);
+    opacity: 1;
+  }
+  91% {
+    text-shadow: 0 3px 0 rgb(0 0 0 / 28%), 0 0 26px rgb(255 220 60 / 74%);
+    opacity: 0.84;
+  }
+  92.5% {
+    text-shadow: 0 3px 0 rgb(0 0 0 / 28%), 0 0 10px rgb(255 220 60 / 36%);
+    opacity: 1;
+  }
+  94.5% {
+    text-shadow: 0 3px 0 rgb(0 0 0 / 28%), 0 0 32px rgb(255 220 60 / 82%);
+    opacity: 0.80;
+  }
+  96% {
+    text-shadow: 0 3px 0 rgb(0 0 0 / 28%), 0 0 16px rgb(255 220 60 / 48%);
+    opacity: 0.96;
+  }
+}
+
+/* slow light sweep across each cell interior */
+@keyframes barshimmer {
+  0% { transform: translateX(-100%); opacity: 0; }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+/* countdown chip heartbeat */
+@keyframes chippulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgb(14 116 144 / 0%); }
+  50% { opacity: 0.76; box-shadow: 0 0 6px 2px rgb(14 116 144 / 42%); }
+}
+
+/* blue ambient glow for timeout cells */
+@keyframes cellglow {
+  0%, 100% { box-shadow: inset 0 10px 22px rgb(0 0 0 / 26%), 0 0 6px 0 rgb(37 99 235 / 0%); }
+  50% { box-shadow: inset 0 10px 22px rgb(0 0 0 / 26%), 0 0 16px 3px rgb(37 99 235 / 20%); }
+}
+
+/* ominous red pulse for death row */
+@keyframes deathglow {
+  0%, 100% { box-shadow: inset 0 10px 22px rgb(0 0 0 / 26%), 0 0 6px 0 rgb(220 38 38 / 0%); }
+  50% { box-shadow: inset 0 10px 22px rgb(0 0 0 / 26%), 0 0 20px 4px rgb(220 38 38 / 30%); }
+}
+
+/* execution scene: slide up from below + fade out at end */
+@keyframes scenelifecycle {
+  0% { opacity: 0; transform: translateX(-50%) translateY(16px) scale(0.96); }
+  7% { opacity: 1; transform: translateX(-50%) translateY(-4px) scale(1.01); }
+  11% { transform: translateX(-50%) translateY(0) scale(1); }
+  88% { opacity: 1; transform: translateX(-50%) scale(1); }
+  100% { opacity: 0; transform: translateX(-50%) scale(1); }
+}
+
+/* white flash when scene enters */
+@keyframes sceneflash {
+  from { opacity: 0.55; }
+  to { opacity: 0; }
+}
+
+/* execution banner: slide up + fade out */
+@keyframes bannerlifecycle {
+  0% { opacity: 0; transform: translateY(20px); }
+  10% { opacity: 1; transform: translateY(0); }
+  88% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(6px); }
+}
+
+/* animated water ripple stripes */
+@keyframes waterflow {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 36px 36px, 0 0; }
+}
+
+@keyframes launch {
+  0% { transform: translate(0, 0) rotate(0); opacity: 1; }
+  60% { transform: translate(280px, -170px) rotate(-18deg); opacity: 1; }
+  100% { transform: translate(420px, -230px) rotate(-24deg); opacity: 0; }
+}
+
+/* arm starts tilted left (loaded), snaps clockwise to throw right */
+@keyframes armthrow {
+  0% { transform: rotate(-52deg); }
+  38% { transform: rotate(74deg); }
+  62% { transform: rotate(58deg); }
+  100% { transform: rotate(50deg); }
+}
+
+/* full tumbling spin during catapult flight */
+@keyframes catapult-flight {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  18% {
+    transform: translate3d(100px, -82px, 0) rotate(-72deg);
+    opacity: 1;
+  }
+  40% {
+    transform: translate3d(245px, -138px, 0) rotate(-162deg);
+    opacity: 1;
+  }
+  62% {
+    transform: translate3d(395px, -122px, 0) rotate(-238deg);
+    opacity: 1;
+  }
+  82% {
+    transform: translate3d(535px, -50px, 0) rotate(-304deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(622px, 10px, 0) rotate(-352deg);
+    opacity: 0;
+  }
+}
+
+/* plank walk with nervous sway, then plunge */
+@keyframes plank-walk-fall {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  18% {
+    transform: translate3d(56px, -2px, 0) rotate(-1.5deg);
+    opacity: 1;
+  }
+  36% {
+    transform: translate3d(112px, 0, 0) rotate(1deg);
+    opacity: 1;
+  }
+  54% {
+    transform: translate3d(168px, -2px, 0) rotate(-1.5deg);
+    opacity: 1;
+  }
+  72% {
+    transform: translate3d(212px, 0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  80% {
+    transform: translate3d(226px, 12px, 0) rotate(22deg);
+    opacity: 1;
+  }
+  92% {
+    transform: translate3d(242px, 108px, 0) rotate(70deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(252px, 194px, 0) rotate(92deg);
+    opacity: 0;
+  }
+}
+
+@keyframes splash-core {
+  0% {
+    opacity: 0;
+    transform: scale(0.45);
+    background: radial-gradient(circle at center, rgb(255 255 255 / 0%), rgb(34 211 238 / 0%));
+  }
+  25% {
+    opacity: 1;
+    transform: scale(0.88);
+    background: radial-gradient(circle at center, rgb(255 255 255 / 90%), rgb(34 211 238 / 0%));
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+    background: radial-gradient(circle at center, rgb(255 255 255 / 0%), rgb(34 211 238 / 0%));
+  }
+}
+
+@keyframes splash-ring-outer {
+  0% { opacity: 0; transform: scale(0.2); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.35); }
+}
+
+@keyframes splash-ring-inner {
+  0% { opacity: 0; transform: scale(0.25); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.45); }
+}
