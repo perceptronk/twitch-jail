@@ -1,77 +1,35 @@
 # Twitch Jail Overlay
 
-Browser stream overlay powered by a local Python server.
+Single-file browser overlay. Open `index.html` in OBS as a browser source — no server required.
 
 ## What it does
 
-1. Open `/<channel>` (example: `/b8stal`).
-2. The server joins that Twitch chat and listens to moderation events.
-3. Timeout events display the user avatar + user id behind bars for the timeout duration.
-4. Ban events display the user in a dedicated `Death Row` section.
-5. Mods or broadcaster can run `!execute <userId-or-username> <method>` in chat.
-6. Supported execution methods right now:
-	- `catapult`
-	- `plank`
+- Connects directly to Twitch IRC from the browser.
+- Timeout events display the user's avatar behind bars for the timeout duration.
+- Ban events move the user to the **Death Row** section.
+- Mods or broadcaster can run `!execute <username> <method>` in chat to trigger an execution animation.
+- Supported execution methods: `catapult`, `plank`.
 
-## Run
+## Setup
 
-```bash
-uv sync
-uv run uvicorn twitch_jail.main:app --host 127.0.0.1 --port 8000 --reload
-```
+1. Add `index.html` as a **Browser Source** in OBS.
+2. Use the **Connect** controls at the bottom of the overlay to enter your channel name and connect.
+3. The overlay connects to Twitch chat anonymously — no credentials needed.
 
-Then open:
+## Controls
 
-- `http://127.0.0.1:8000/b8stal` (replace with your channel)
+The control panel at the bottom is for local testing and is invisible against a transparent background in OBS.
 
-## Twitch auth options
-
-The app supports two modes:
-
-- Anonymous read mode (default): no env vars required
-- Bot-auth mode (recommended for reliability): set env vars below
-
-### Optional bot credentials
-
-```bash
-set TWITCH_BOT_USERNAME=your_bot_name
-set TWITCH_BOT_OAUTH=oauth:xxxxxxxxxxxxxxxxxxxx
-```
-
-### Optional real profile image lookup (Helix)
-
-If these are not set, fallback avatars are generated.
-
-```bash
-set TWITCH_CLIENT_ID=your_client_id
-set TWITCH_APP_ACCESS_TOKEN=your_app_access_token
-```
+| Control | What it does |
+|---|---|
+| Channel + Connect | Joins that Twitch IRC channel |
+| Timeout | Adds a user to Timeout Cell for 5 minutes |
+| Ban | Adds a user to Death Row |
+| Untimeout / Unban | Removes a user from either section |
+| Execute | Triggers the execution animation (auto-bans first if needed) |
 
 ## Notes
 
-- `!execute` can only be triggered by broadcaster/mod badges.
-- Command format is strict: exactly 3 tokens.
-- `method` must be `catapult` or `plank`.
-- Target accepts either username or user id from death row.
-
-## Dummy simulation routes (safe)
-
-These endpoints only update the local overlay state. They do not issue real timeout/ban actions on Twitch.
-
-- `GET /<channel>/timeout/<username>`
-- `GET /<channel>/ban/<username>`
-- `GET /<channel>/execute/<username>/<method>`
-
-Examples:
-
-```bash
-curl http://127.0.0.1:8000/b8stal/timeout/testuser
-curl http://127.0.0.1:8000/b8stal/ban/testuser
-curl http://127.0.0.1:8000/b8stal/execute/testuser/catapult
-```
-
-Behavior:
-
-- Timeout simulation duration is always 300 seconds (5 minutes).
-- Ban simulation adds the user to the Death Row overlay section.
-- Execute simulation triggers the animation with `catapult` or `plank`.
+- `!execute` only works for broadcaster and moderator badges.
+- Command format is strict: exactly 3 tokens — `!execute <username> <method>`.
+- Avatars are fetched from ivr.fi; identicon placeholders are shown while loading.

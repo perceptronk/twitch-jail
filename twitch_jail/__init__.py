@@ -1,1 +1,0 @@
-"""Twitch Jail overlay package."""
