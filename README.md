@@ -17,7 +17,7 @@ Browser stream overlay powered by a local Python server.
 
 ```bash
 uv sync
-uv run uvicorn death_games.main:app --host 127.0.0.1 --port 8000 --reload
+uv run uvicorn twitch_jail.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 Then open:
