@@ -140,7 +140,7 @@ body {
       rgb(0 0 0 / 35%) 0 6px,
       rgb(90 102 121 / 98%) 6px 23px,
       rgb(0 0 0 / 36%) 23px 26px,
-      transparent 26px 52px
+      transparent 26px 60px
     );
 }
 
@@ -1269,36 +1269,19 @@ async function resolveAvatar(username) {
   return dicebearUrl(username);
 }
 
-function handleClearchat(tags, trailing) {
+async function handleClearchat(tags, trailing) {
   const target = trailing.trim().toLowerCase();
   if (!target) return;
 
   const userId = tags["target-user-id"] || target;
-  const placeholder = dicebearUrl(target);
   const duration = tags["ban-duration"];
+  const avatar = await resolveAvatar(target);
 
   if (duration && /^\d+$/.test(duration)) {
-    addTimeout(target, userId, placeholder, parseInt(duration, 10));
+    addTimeout(target, userId, avatar, parseInt(duration, 10));
   } else {
-    addBan(target, userId, placeholder);
+    addBan(target, userId, avatar);
   }
-
-  resolveAvatar(target).then((url) => {
-    if (url === placeholder) return;
-    for (const map of [timeouts, deathRow]) {
-      const entry = map.get(target);
-      if (entry) {
-        entry.avatar_url = url;
-        for (const cardMap of [timeoutCards, deathRowCards]) {
-          const card = cardMap.get(target);
-          if (card) {
-            const img = card.querySelector("img");
-            if (img) img.src = url;
-          }
-        }
-      }
-    }
-  });
 }
 
 function handlePrivmsg(tags, trailing) {
@@ -1430,48 +1413,32 @@ function handleDisconnect() {
 
 /* ── local simulation ─────────────────────────────────────────────────── */
 
-function simulate(action) {
+async function simulate(action) {
   const username = document.getElementById("usernameInput").value.trim().toLowerCase();
   if (!username) return;
 
-  const avatar = dicebearUrl(username);
-  const userId = username;
-
-  if (action === "timeout") {
-    addTimeout(username, userId, avatar, 300);
-  } else if (action === "ban") {
-    addBan(username, userId, avatar);
-  } else if (action === "untimeout") {
+  if (action === "untimeout") {
     timeouts.delete(username);
     removeCard(timeoutCards, timeoutList, timeoutWalkers, username);
     return;
-  } else if (action === "unban") {
+  }
+  if (action === "unban") {
     deathRow.delete(username);
     removeCard(deathRowCards, deathRowList, deathRowWalkers, username);
     return;
-  } else if (action === "execute") {
-    if (!deathRow.has(username)) {
-      addBan(username, userId, avatar);
-    }
-    const method = document.getElementById("methodSelect").value;
-    executeEntry(username, method, "simulation");
-    return;
   }
 
-  resolveAvatar(username).then((url) => {
-    if (url === avatar) return;
-    for (const map of [timeouts, deathRow]) {
-      const entry = map.get(username);
-      if (entry) entry.avatar_url = url;
-    }
-    for (const cardMap of [timeoutCards, deathRowCards]) {
-      const card = cardMap.get(username);
-      if (card) {
-        const img = card.querySelector("img");
-        if (img) img.src = url;
-      }
-    }
-  });
+  const avatar = await resolveAvatar(username);
+
+  if (action === "timeout") {
+    addTimeout(username, username, avatar, 300);
+  } else if (action === "ban") {
+    addBan(username, username, avatar);
+  } else if (action === "execute") {
+    if (!deathRow.has(username)) addBan(username, username, avatar);
+    const method = document.getElementById("methodSelect").value;
+    executeEntry(username, method, "simulation");
+  }
 }
 
 /* ── bootstrap ────────────────────────────────────────────────────────── */
