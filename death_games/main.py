@@ -439,7 +439,7 @@ runtime = Runtime()
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = BASE_DIR / "static"
 
-app = FastAPI(title="Death Games Overlay")
+app = FastAPI(title="Twitch Jail Overlay")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 

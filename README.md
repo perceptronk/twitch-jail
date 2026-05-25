@@ -1,4 +1,4 @@
-# Death Games Overlay
+# Twitch Jail Overlay
 
 Browser stream overlay powered by a local Python server.
 

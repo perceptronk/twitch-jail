@@ -1,1 +1,1 @@
-"""Death games overlay package."""
+"""Twitch Jail overlay package."""
