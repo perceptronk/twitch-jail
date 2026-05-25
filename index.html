@@ -1080,7 +1080,7 @@ function createCard(entry) {
 
   const id = document.createElement("div");
   id.className = "prisoner-id";
-  id.textContent = `${entry.user_id}`;
+  id.textContent = entry.username;
 
   card.append(avatar, id);
   return card;
@@ -1095,7 +1095,7 @@ function updateCard(card, entry, statusLabel) {
   }
 
   if (id) {
-    const nextId = `${entry.user_id}`;
+    const nextId = entry.username;
     if (id.textContent !== nextId) {
       id.textContent = nextId;
     }
@@ -1130,7 +1130,7 @@ function createExecutionPrisoner(entry) {
 
   const id = document.createElement("div");
   id.className = "prisoner-id";
-  id.textContent = `${entry.user_id}`;
+  id.textContent = entry.username;
 
   face.append(avatar);
   wrapper.append(face, id);
@@ -1485,6 +1485,12 @@ for (const btn of document.querySelectorAll("[data-action]")) {
 window.setInterval(render, 1000);
 render();
 requestAnimationFrame(tickMotion);
+
+const _autoChannel = new URLSearchParams(window.location.search).get("channel");
+if (_autoChannel) {
+  document.getElementById("channelInput").value = _autoChannel;
+  handleConnect();
+}
     </script>
   </body>
 </html>
